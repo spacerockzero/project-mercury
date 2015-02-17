@@ -10,5 +10,8 @@ module.exports = {
     'https://familysearch.org/reference/usingModules',
     'https://familysearch.org/reference/unitTests',
     'https://familysearch.org/reference/I18N'
+  ],
+  'home': [
+    'https://familysearch.org/'
   ]
 };

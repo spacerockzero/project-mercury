@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h2= title
+
+  ul
+    each rec in records
+      li
+        p= rec.appName
+        p= rec.data.url
+        p= "ttfb: " + rec.data.metrics.timeToFirstByte

@@ -4,8 +4,6 @@ block content
   h2= title
 
   ul
-    each rec in records
+    each app in appNames
       li
-        p= rec.appName
-        p= rec.data.url
-        p= "ttfb: " + rec.data.metrics.timeToFirstByte
+        a( href='perf/#{app}')= app

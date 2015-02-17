@@ -10,7 +10,7 @@ rules.standard = {
 
 };
 
-/* GET users listing. */
+/* POST webhook to start the perf test */
 router.post('/', function(req, res, next) {
   res.send('respond with a perf resource');
   console.log('req.repository.name',req.body.repository.name);
@@ -22,17 +22,6 @@ router.post('/', function(req, res, next) {
   });
 });
 
-router.get('/', function(req, res, next) {
-  // get records
-  Record.find(function(err, records){
-    // returns records[]
-    if(err) next(err);
-    res.render('perf',{
-      title: 'Performance View',
-      records: records
-    });
-  });
-});
 
 function runPerfTest(appName,site){
   console.log('site',site);
@@ -63,5 +52,39 @@ function savePerfTest(appName,data,cb){
     });
   }
 }
+
+
+/* GET main performance data dashboard */
+router.get('/', function(req, res, next) {
+  // get distinct appNames
+  Record.distinct('appName',{},function(err, appNames){
+    // returns records[]
+    if(err) next(err);
+    res.render('perf',{
+      title: 'Performance View',
+      appNames: appNames
+    });
+  });
+});
+
+/* GET performance data dashboard for one app*/
+router.get('/:appName', function(req, res, next) {
+  res.render('dashApp',{
+    title: 'App Performance View',
+    records: res.locals.records
+  });
+});
+
+// Prefetch the app records for this app
+router.param('appName', function(req, res, next, appName) {
+  Record.find({appName: appName},function(err, records){
+    console.log('err',err)
+    console.log('records.length',records.length)
+    // returns records[]
+    if(err) next(err);
+    res.locals.records = records;
+    next();
+  });
+});
 
 module.exports = router;

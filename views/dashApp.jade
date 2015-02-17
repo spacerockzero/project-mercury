@@ -9,3 +9,12 @@ block content
         p= rec.appName
         p= rec.data.url
         p= "ttfb: " + rec.data.metrics.timeToFirstByte
+        p= "offenders: "
+          if rec.data.offenders
+            ul
+              -console.log(Object.keys(rec.data.offenders))
+                for key in Object.keys(rec.data.offenders)
+                  li= key + ':'
+                    ul
+                      each item in rec.data.offenders[key]
+                        li= item

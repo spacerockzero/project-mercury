@@ -5,10 +5,12 @@ html
     link(rel='stylesheet', href='/components/materialize/dist/css/materialize.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
+    nav
+      div.nav-wrapper.red
+        i.mdi-image-flash-on.left.text-yellow
+        a.brand-logo(href='/')= "Project Mercury"
+        i.mdi-image-flash-on.right.text-yellow
     div.container
-      nav
-        div.nav-wrapper.center-align
-          a.brand-logo(href='/')= "Project Mercury"
       block content
       script(src='/components/jquery/dist/jquery.min.js')
       script(src='/components/materialize/dist/js/materialize.min.js')

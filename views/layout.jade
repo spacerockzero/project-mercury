@@ -2,7 +2,13 @@ doctype html
 html
   head
     title= title
+    link(rel='stylesheet', href='/components/materialize/dist/css/materialize.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    h1= "Project Mercury"
-    block content
+    div.container
+      nav
+        div.nav-wrapper.center-align
+          a.brand-logo(href='/')= "Project Mercury"
+      block content
+      script(src='/components/jquery/dist/jquery.min.js')
+      script(src='/components/materialize/dist/js/materialize.min.js')

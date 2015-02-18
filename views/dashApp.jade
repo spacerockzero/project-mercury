@@ -1,20 +1,39 @@
 extends layout
 
+
 block content
-  h2= title
+  h3= title
 
   ul
     each rec in records
-      li
-        p= rec.appName
-        p= rec.data.url
-        p= "ttfb: " + rec.data.metrics.timeToFirstByte
-        p= "offenders: "
-          if rec.data.offenders
-            ul
-              -console.log(Object.keys(rec.data.offenders))
-                for key in Object.keys(rec.data.offenders)
-                  li= key + ':'
-                    ul
-                      each item in rec.data.offenders[key]
-                        li= item
+      div.collapsible(data-collapsible='expandable')
+        div.collapsible-header= rec.data.url
+          i.mdi-content-add-box
+        div.collapsible-body
+          div.collapsible(data-collapsible='expandable')
+            div
+              div.collapsible-header='Metrics'
+                i.mdi-content-add-box
+                i.mdi-content-add-box
+              div.collapsible-body
+                if rec.data.metrics
+                  for key in Object.keys(rec.data.metrics)
+                    div.row
+                      div.col.s6= key
+                      div.col.s6= rec.data.metrics[key]
+            div
+              div.collapsible-header='Offenders'
+                i.mdi-content-add-box
+                i.mdi-content-add-box
+              div.collapsible-body.col.s10.offset-2
+                if rec.data.offenders
+                  ul.collapsible(data-collapsible='expandable')
+                    for key in Object.keys(rec.data.offenders)
+                      div
+                        div.collapsible-header= key
+                          i.mdi-content-add-box
+                          i.mdi-content-add-box
+                          i.mdi-content-add-box
+                        div.collapsible-body
+                          each item in rec.data.offenders[key]
+                            p= item

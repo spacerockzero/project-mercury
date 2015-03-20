@@ -12,6 +12,32 @@ block content
         div.collapsible-body
           div.collapsible(data-collapsible='expandable')
             div
+              div.collapsible-header='Quick Metrics'
+                i.mdi-content-add-box
+                i.mdi-content-add-box
+              div.collapsible-body
+                if rec.data.metrics
+                  //- # of requests
+                  div
+                    b 
+                      | # of requests: 
+                    | #{rec.data.metrics.requests}
+                  //- size of total download
+                  div
+                    b
+                      | Total download size: 
+                    | #{rec.data.metrics.bodySize}
+                  //- cache perfection
+                  div
+                    b Cache perfection:
+                    div oldCachingHeaders: #{rec.data.metrics.oldCachingHeaders} 
+                    div cachingDisabled: #{rec.data.metrics.cachingDisabled}
+                    div cachingTooShort: #{rec.data.metrics.cachingTooShort}
+                    div cachingNotSpecified: #{rec.data.metrics.cachingNotSpecified}
+                    div cachePasses: #{rec.data.metrics.cachePasses} 
+                    div cacheMisses: #{rec.data.metrics.cacheMisses} 
+                    div cacheHits: #{rec.data.metrics.cacheHits} 
+            div
               div.collapsible-header='Metrics'
                 i.mdi-content-add-box
                 i.mdi-content-add-box

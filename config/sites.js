@@ -5,6 +5,7 @@
 module.exports = {
   'reference': [
     'https://familysearch.org/reference/',
+    'https://familysearch.org/reference/bench/',
     'https://familysearch.org/reference/fsorg/',
     'https://familysearch.org/reference/createApp/',
     'https://familysearch.org/reference/cloneApp/',

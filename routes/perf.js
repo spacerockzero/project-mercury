@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var phantomas = require('phantomas'),
-    task;
+var phantomas = require('phantomas');
 var sites = require('../config/sites');
 var rules = require('../config/rules');
 var mongoose = require('mongoose'),
@@ -42,10 +41,10 @@ function runPerfTest(appName,site,config){
   console.log('perftest site',site);
   console.log('perftest appName',appName);
   console.log('perftest config',config);
-  var thisConfig = config || rules.standard
-  thisConfig.url = site;
-  console.log('thisConfig before run: ',thisConfig);
-  task = phantomas(thisConfig.url,thisConfig)
+  var config = config || rules.standard
+  config.url = site;
+  console.log('config before run: ',config);
+  var task = phantomas(config.url,config)
   // , function(error, json, results) {
   //   appName = site = config = thisConfig = false;
   //   if(error) return console.error('ERROR: ',error);
@@ -75,26 +74,16 @@ function runPerfTest(appName,site,config){
   	// console.log('res',res);
     console.log('Exit code: %d', res.code);
     console.log('res.json.url',res.json.url);
-  	// console.log('Number of requests: %d', res.results.getMetric('requests'));
-  	// console.log('Failed asserts: %j', res.results.getFailedAsserts());
-    // var testedUrl = thisResults.getUrl();
-    // console.log('returned results for ', testedUrl, ': thisResults',thisResults);
-    // // console.log('thisResults.getMetrics()',thisResults.getMetrics());
-    // // console.log('thisResults.getAllOffenders()',thisResults.getAllOffenders());
-    // // if(testedUrl !== thisConfig.url){
-    // //   return console.log('ERROR: Not correct page, forwarded to: ',testedUrl);
-    // // }
-    // // else {
     var thisjson = {
-      metrics: thisResults.getMetrics(),
-      offenders: thisResults.getAllOffenders(),
+      metrics: res.results.getMetrics(),
+      offenders: res.results.getAllOffenders(),
       url: res.json.url
     };
     savePerfTest(appName,res.json.url,thisjson,function(err, record){
       console.log('err: ',err);
-      console.log('record saved');
+      console.log('record saved:',res.json.url);
+      thisjson = null;
     });
-    // }
   }).
   fail(function(code) {
   	console.log('FAIL: Exit code #%d', code);

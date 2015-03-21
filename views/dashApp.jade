@@ -8,12 +8,12 @@ block content
     each rec in records
       if rec
         div.collapsible(data-collapsible='expandable')
-          div.collapsible-header= rec.data.url
+          div.collapsible-header.truncate= rec.data.url
             i.mdi-content-add-box
           div.collapsible-body
             div.collapsible(data-collapsible='expandable')
               div
-                div.collapsible-header='Quick Metrics'
+                div.collapsible-header.truncate='Quick Metrics'
                   i.mdi-content-add-box
                   i.mdi-content-add-box
                 div.collapsible-body
@@ -39,7 +39,7 @@ block content
                       div cacheMisses: #{rec.data.metrics.cacheMisses} 
                       div cacheHits: #{rec.data.metrics.cacheHits} 
               div
-                div.collapsible-header='Metrics'
+                div.collapsible-header.truncate='Metrics'
                   i.mdi-content-add-box
                   i.mdi-content-add-box
                 div.collapsible-body
@@ -49,7 +49,7 @@ block content
                         div.col.s6= key
                         div.col.s6= rec.data.metrics[key]
               div
-                div.collapsible-header='Offenders'
+                div.collapsible-header.truncate='Offenders'
                   i.mdi-content-add-box
                   i.mdi-content-add-box
                 div.collapsible-body.col.s10.offset-2
@@ -57,10 +57,11 @@ block content
                     ul.collapsible(data-collapsible='expandable')
                       for key in Object.keys(rec.data.offenders)
                         div
-                          div.collapsible-header= key
+                          div.collapsible-header.truncate= key
                             i.mdi-content-add-box
                             i.mdi-content-add-box
                             i.mdi-content-add-box
                           div.collapsible-body
+                            //- very slow loop, replace with on-demand client-side module
                             each item in rec.data.offenders[key]
                               p= item

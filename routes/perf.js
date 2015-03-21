@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var async = require('async');
 var phantomas = require('phantomas');
 var sites = require('../config/sites');
 var rules = require('../config/rules');
@@ -30,45 +31,26 @@ router.get('/run/:app', function(req, res, next) {
   console.log('thisConfig:',thisConfig);
   var urls = sites[req.params.app];
   console.log('urls',urls);
-  urls.map(function(site){
-    runPerfTest(req.params.app,site,thisConfig);
+  // map the perf test functions in serial, so the server doesn't get overwhelmed
+  async.mapSeries(urls,function(site,callback){
+    runPerfTest(req.params.app,site,thisConfig,callback);
+  },function(err, results){
+    if(err) console.error('ERROR: async error ',err);
   });
   res.send('running perf tests on ' + req.params.app);
 });
 
 
-function runPerfTest(appName,site,config){
+function runPerfTest(appName,site,config,cb){
   console.log('perftest site',site);
   console.log('perftest appName',appName);
   console.log('perftest config',config);
   var config = config || rules.standard
   config.url = site;
   console.log('config before run: ',config);
+
   var task = phantomas(config.url,config)
-  // , function(error, json, results) {
-  //   appName = site = config = thisConfig = false;
-  //   if(error) return console.error('ERROR: ',error);
-  //   // else if (json.url !== site){
-  //   //   return console.log('ERROR: Not correct page, forwarded to: ',json.url);
-  //   // }
-  //   // else {
-  //   //   console.log('returned results for ', site);
-  //   //   // console.log('site=',site);
-  //   //   // console.log('results',results);
-  //   //   // console.log('json',json);
-  //   //   // console.log('results.getMetrics()',results.getMetrics());
-  //   //   // console.log('results.getAllOffenders()',results.getAllOffenders());
-  //   //   var jsonResults = {
-  //   //     metrics: results.getMetrics(),
-  //   //     offenders: results.getAllOffenders(),
-  //   //     url: site
-  //   //   };
-  //   //   savePerfTest(appName,site,jsonResults,function(err, record){
-  //   //     console.log('err: ',err);
-  //   //     console.log('record saved');
-  //   //   });
-  //   // }
-  // });
+
   task.then(function(res) {
     var thisResults = res.results;
   	// console.log('res',res);
@@ -84,37 +66,17 @@ function runPerfTest(appName,site,config){
       console.log('record saved:',res.json.url);
       thisjson = null;
     });
+    if(cb) cb(); //don't wait for db to start next test
   }).
   fail(function(code) {
   	console.log('FAIL: Exit code #%d', code);
+    if(cb) cb();
   	process.exit(code);
   }).
   progress(function(progress) {
   	console.log('Loading progress: %d%', progress * 100);
   }).
   done();
-  // task.on('results', function(results){
-  //   var thisResults = results;
-  //   var testedUrl = thisResults.getUrl();
-  //   console.log('returned results for ', testedUrl);
-  //   console.log('thisResults',thisResults);
-  //   // console.log('results.getMetrics()',results.getMetrics());
-  //   // console.log('results.getAllOffenders()',results.getAllOffenders());
-  //   if(testedUrl !== thisConfig.url){
-  //     return console.log('ERROR: Not correct page, forwarded to: ',testedUrl);
-  //   }
-  //   else {
-  //     var thisjson = {
-  //       metrics: thisResults.getMetrics(),
-  //       offenders: thisResults.getAllOffenders(),
-  //       url: testedUrl
-  //     };
-  //     savePerfTest(appName,testedUrl,thisjson,function(err, record){
-  //       console.log('err: ',err);
-  //       console.log('record saved');
-  //     });
-  //   }
-  // });
 }
 
 function savePerfTest(appName,url,data,cb){

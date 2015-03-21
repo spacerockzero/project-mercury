@@ -1,14 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var phantomas = require('phantomas');
+var phantomas = require('phantomas'),
+    task;
 var sites = require('../config/sites');
 var rules = require('../config/rules');
 var mongoose = require('mongoose'),
     Record = require('../models/Record');
 
-rules.standard = {
-
-};
 
 /* POST webhook to start the perf test */
 router.post('/', function(req, res, next) {
@@ -23,38 +21,111 @@ router.post('/', function(req, res, next) {
 });
 /* GET req to run scan on appname passed in, with optional query params */
 router.get('/run/:app', function(req, res, next) {
-  res.send('running perf tests on ' + req.params.app);
   console.log('req.param.app',req.params.app);
   console.log('rules.standard',rules.standard);
+  var thisConfig = rules.standard;
+  if(req.query.fssessionid) {
+    console.log('fssessionid passed in');
+    thisConfig['cookie'] = 'fssessionid='+req.query.fssessionid+';domain=beta.familysearch.org';
+  }
+  console.log('thisConfig:',thisConfig);
   var urls = sites[req.params.app];
   console.log('urls',urls);
   urls.map(function(site){
-    runPerfTest(req.params.app,site);
+    runPerfTest(req.params.app,site,thisConfig);
   });
+  res.send('running perf tests on ' + req.params.app);
 });
 
 
-function runPerfTest(appName,site){
-  console.log('site',site);
-  var task = phantomas(site, rules.standard, function(error, json, results) {
-    if(error) console.error(error);
-  });
-  task.on('results', function(results){
-    console.log('returned results for ', site);
-    // console.log('site=',site);
-    // console.log('results',results);
-    // console.log('results.getMetrics()',results.getMetrics());
-    // console.log('results.getAllOffenders()',results.getAllOffenders());
-    var json = {
-      metrics: results.getMetrics(),
-      offenders: results.getAllOffenders(),
-      url: site
+function runPerfTest(appName,site,config){
+  console.log('perftest site',site);
+  console.log('perftest appName',appName);
+  console.log('perftest config',config);
+  var thisConfig = config || rules.standard
+  thisConfig.url = site;
+  console.log('thisConfig before run: ',thisConfig);
+  task = phantomas(thisConfig.url,thisConfig)
+  // , function(error, json, results) {
+  //   appName = site = config = thisConfig = false;
+  //   if(error) return console.error('ERROR: ',error);
+  //   // else if (json.url !== site){
+  //   //   return console.log('ERROR: Not correct page, forwarded to: ',json.url);
+  //   // }
+  //   // else {
+  //   //   console.log('returned results for ', site);
+  //   //   // console.log('site=',site);
+  //   //   // console.log('results',results);
+  //   //   // console.log('json',json);
+  //   //   // console.log('results.getMetrics()',results.getMetrics());
+  //   //   // console.log('results.getAllOffenders()',results.getAllOffenders());
+  //   //   var jsonResults = {
+  //   //     metrics: results.getMetrics(),
+  //   //     offenders: results.getAllOffenders(),
+  //   //     url: site
+  //   //   };
+  //   //   savePerfTest(appName,site,jsonResults,function(err, record){
+  //   //     console.log('err: ',err);
+  //   //     console.log('record saved');
+  //   //   });
+  //   // }
+  // });
+  task.then(function(res) {
+    var thisResults = res.results;
+  	// console.log('res',res);
+    console.log('Exit code: %d', res.code);
+    console.log('res.json.url',res.json.url);
+  	// console.log('Number of requests: %d', res.results.getMetric('requests'));
+  	// console.log('Failed asserts: %j', res.results.getFailedAsserts());
+    // var testedUrl = thisResults.getUrl();
+    // console.log('returned results for ', testedUrl, ': thisResults',thisResults);
+    // // console.log('thisResults.getMetrics()',thisResults.getMetrics());
+    // // console.log('thisResults.getAllOffenders()',thisResults.getAllOffenders());
+    // // if(testedUrl !== thisConfig.url){
+    // //   return console.log('ERROR: Not correct page, forwarded to: ',testedUrl);
+    // // }
+    // // else {
+    var thisjson = {
+      metrics: thisResults.getMetrics(),
+      offenders: thisResults.getAllOffenders(),
+      url: res.json.url
     };
-    savePerfTest(appName,site,json,function(err, record){
+    savePerfTest(appName,res.json.url,thisjson,function(err, record){
       console.log('err: ',err);
       console.log('record saved');
     });
-  });
+    // }
+  }).
+  fail(function(code) {
+  	console.log('FAIL: Exit code #%d', code);
+  	process.exit(code);
+  }).
+  progress(function(progress) {
+  	console.log('Loading progress: %d%', progress * 100);
+  }).
+  done();
+  // task.on('results', function(results){
+  //   var thisResults = results;
+  //   var testedUrl = thisResults.getUrl();
+  //   console.log('returned results for ', testedUrl);
+  //   console.log('thisResults',thisResults);
+  //   // console.log('results.getMetrics()',results.getMetrics());
+  //   // console.log('results.getAllOffenders()',results.getAllOffenders());
+  //   if(testedUrl !== thisConfig.url){
+  //     return console.log('ERROR: Not correct page, forwarded to: ',testedUrl);
+  //   }
+  //   else {
+  //     var thisjson = {
+  //       metrics: thisResults.getMetrics(),
+  //       offenders: thisResults.getAllOffenders(),
+  //       url: testedUrl
+  //     };
+  //     savePerfTest(appName,testedUrl,thisjson,function(err, record){
+  //       console.log('err: ',err);
+  //       console.log('record saved');
+  //     });
+  //   }
+  // });
 }
 
 function savePerfTest(appName,url,data,cb){

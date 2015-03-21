@@ -1,5 +1,6 @@
 module.exports = {
-  standard: {
-
+  'standard': {
+    'timeout': '60'
+    // 'film-strip': true
   }
 };

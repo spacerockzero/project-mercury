@@ -3,6 +3,7 @@
  */
 
 module.exports = {
+  // reference has to be prod, since its not mounted elsewhere
   'reference': [
     'https://familysearch.org/reference/',
     'https://familysearch.org/reference/bench/',
@@ -16,7 +17,19 @@ module.exports = {
     'https://familysearch.org/reference/unitTests/',
     'https://familysearch.org/reference/I18N/'
   ],
+  // the rest of these can be beta, but should be woken before each test round
   'home': [
-    'https://familysearch.org/'
+    'https://beta.familysearch.org/'
+  ],
+  'frontier-tree': [
+    'https://beta.familysearch.org/tree/#view=tree&section=pedigree',
+    'https://beta.familysearch.org/tree/#view=tree&section=descendancy',
+    'https://beta.familysearch.org/tree/#view=tree&section=fan',
+    'https://beta.familysearch.org/tree/#view=tree&section=portrait',
+    'https://beta.familysearch.org/tree/#view=ancestor'
+  ],
+  'photos': [
+    'https://beta.familysearch.org/photos/',
+    'https://beta.familysearch.org/photos/images/'
   ]
 };

@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var compression = require('compression');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
@@ -38,10 +39,25 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
+app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+var oneDay = 86400000; // in milliseconds
+app.use(express.static(path.join(__dirname, 'public'),{
+  maxage: oneDay
+}));
+
+// set browser caching on GETs
+app.use(function (req, res, next) {
+  // TODO: add error checking so we don't cache error responses...
+  // if (! ('JSONResponcs' in res) ) {
+  //   return next();
+  // }
+  var expires = process.env.API_EXPIRES || 0;
+  res.setHeader('Cache-Control', 'public, max-age=' + expires);
+  return next();
+});
 
 app.use('/', routes);
 app.use('/perf', perf);

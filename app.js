@@ -43,9 +43,8 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-var oneDay = 86400000; // in milliseconds
 app.use(express.static(path.join(__dirname, 'public'),{
-  maxage: oneDay
+  maxage: process.env.ASSET_EXPIRES || 0
 }));
 
 // set browser caching on GETs

@@ -96,7 +96,7 @@ router.get('/', function(req, res, next) {
     // returns records[]
     if(err) next(err);
     res.render('perf',{
-      title: 'Performance View',
+      title: 'All Apps',
       appNames: appNames
     });
   });
@@ -104,8 +104,8 @@ router.get('/', function(req, res, next) {
 
 /* GET performance data dashboard for one app*/
 router.get('/:appName', function(req, res, next) {
-  res.render('dashApp',{
-    title: 'App Performance View',
+  res.render('appPerformance',{
+    title: 'App Performance by unique URL',
     records: res.locals.records
   });
 });

@@ -1,14 +1,18 @@
 doctype html
-html
+html(lang="en")
   head
+    meta(charset="utf-8")
+    meta(http-equiv="x-ua-compatible" content="ie=edge")
     title= title
+    meta( name="description" content="")
+    meta( name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes" )
     link(rel='stylesheet', href='/components/materialize/dist/css/materialize.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     nav
       div.nav-wrapper.red
         i.mdi-image-flash-on.left.text-yellow
-        a.brand-logo(href='/')= "Project Mercury"
+        a.brand-logo.waves-effect(href='/')= "Project Mercury"
         i.mdi-image-flash-on.right.text-yellow
     div.container
       block content

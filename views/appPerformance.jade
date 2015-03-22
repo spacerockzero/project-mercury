@@ -2,6 +2,8 @@ extends layout
 
 
 block content
+  br
+  a.waves-effect.btn( href="/perf") < back
   h3= title
   p records: #{records.length}
   ul
@@ -62,6 +64,7 @@ block content
                             i.mdi-content-add-box
                             i.mdi-content-add-box
                           div.collapsible-body
-                            each item in rec.data.offenders[key]
-                              //- very slow loop, replace with on-demand client-side module
-                              p #{item}
+                            p #{JSON.stringify(rec.data.offenders[key])}
+                            //- each item in rec.data.offenders[key]
+                            //-   //- very slow loop, replace with on-demand client-side module
+                            //-   p #{item}

@@ -144,9 +144,9 @@ router.param('appName', function(req, res, next, appName) {
 
 function minimizeData(record) {
   // pass on a much smaller record for the minimal results view
-  var smallData = {};
-
   record.data.metrics = {
+    requests: record.data.metrics.requests || '',
+    bodySize: record.data.metrics.bodySize || '',
     oldCachingHeaders: record.data.metrics.oldCachingHeaders || '',
     cachingDisabled: record.data.metrics.cachingDisabled || '',
     cachingTooShort: record.data.metrics.cachingTooShort || '',
@@ -155,7 +155,6 @@ function minimizeData(record) {
     cacheMisses: record.data.metrics.cacheMisses || '',
     cacheHits: record.data.metrics.cacheHits || ''
   };
-
   record.data.offenders = {
     biggestLatency: record.data.offenders.biggestLatency || '',
     slowestResponse: record.data.offenders.slowestResponse || '',
@@ -187,7 +186,6 @@ function minimizeData(record) {
     ajaxRequests: record.data.offenders.ajaxRequests || '',
     postRequests: record.data.offenders.postRequests || ''
   };
-  // record.data = smallData;
   return record;
 }
 

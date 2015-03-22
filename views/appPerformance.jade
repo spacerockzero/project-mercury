@@ -12,12 +12,14 @@ block content
       if rec
         div.collapsible(data-collapsible='expandable')
           div.collapsible-header.truncate= rec.data.url
-            i.mdi-content-add-box
+            //- i.mdi-content-add-box
           div.collapsible-body
             div.collapsible(data-collapsible='expandable')
+
+              //- metrics summary section
               div
                 div.collapsible-header.truncate Metrics
-                  i.mdi-content-add-box
+                  //- i.mdi-content-add-box
                   i.mdi-content-add-box
                 div.collapsible-body
                   if rec.data.metrics
@@ -26,16 +28,17 @@ block content
                     //-   div.row
                     //-     div.col.s6 #{key}
                     //-     div.col.s6 #{rec.data.metrics[key]}
+
+              //- offenders summary section
               div
                 div.collapsible-header.truncate='Offenders'
-                  i.mdi-content-add-box
+                  //- i.mdi-content-add-box
                   i.mdi-content-add-box
                 div.collapsible-body.col.s10.offset-2
                   if rec.data.offenders
                     ul.collapsible(data-collapsible='expandable')
-                      //- pre= JSON.stringify(rec.data.offenders, undefined, 4)
-                      //- very slow loop, replace with on-demand client-side module?
                       //- performance-offenders( items='#{ JSON.stringify({"banana":["val1","val2"],"somethingElse":"good","anotherThing":["thing1","thing2","thing3"]}) }' )
+                      //- very slow loop, replace with on-demand client-side module?
                       pretty-print-object( data='#{ JSON.stringify(rec.data.offenders) }' )
                       //- for key in Object.keys(rec.data.offenders)
                       //-   div

@@ -1,6 +1,6 @@
 {
   "name": "project-mercury",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "engines": {
     "node": "0.12.x"
   },
@@ -25,6 +25,7 @@
     "mongoose": "~3.8.23",
     "morgan": "~1.5.1",
     "phantomas": "~1.10.0",
+    "project-mercury-config": "git+https://github.com/spacerockzero/project-mercury-config.git",
     "q": "^1.2.0",
     "serve-favicon": "~2.2.0",
     "startup": "^1.0.3"

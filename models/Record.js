@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
 // v2 schema
 var RecordSchema = new Schema({
   appName: { type: String, required: true, default: '' },
+  url: { type: String, required: true, default: '' },
   data: { type: Object, required: true, default: {} },
   created_at: { type: Date, required: true, default: Date.now }
 });

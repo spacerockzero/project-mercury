@@ -11,7 +11,7 @@ block content
     each rec in records
       if rec
         div.collapsible(data-collapsible='expandable')
-          div.collapsible-header.truncate= rec.data.url
+          div.collapsible-header.truncate= rec.url
             //- i.mdi-content-add-box
           div.collapsible-body
             div.collapsible(data-collapsible='expandable')

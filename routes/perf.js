@@ -58,8 +58,7 @@ function runPerfTest(appName,site,config,cb){
     console.log('res.json.url',res.json.url);
     var thisjson = {
       metrics: res.results.getMetrics(),
-      offenders: res.results.getAllOffenders(),
-      url: res.json.url
+      offenders: res.results.getAllOffenders()
     };
     savePerfTest(appName,res.json.url,thisjson,function(err, record){
       console.log('err: ',err);
@@ -122,10 +121,14 @@ router.param('appName', function(req, res, next, appName) {
     var query = Record.findOne({url: url}, {}, { sort: { 'created_at': -1 }});
     var promise = query.exec();
     promise.addBack(function(err, record){
-      if(err) console.log('err',err);
-      record = minimizeData(record);
-      // pushes record[]
-      appData.push(record);
+      if(err) {
+        console.log('err',err);
+      }
+      else if(record) {
+        record = minimizeData(record);
+        // pushes record[]
+        appData.push(record);
+      }
       cb(err);
     });
   }

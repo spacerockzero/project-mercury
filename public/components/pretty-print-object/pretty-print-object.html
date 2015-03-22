@@ -1,0 +1,42 @@
+<polymer-element name="pretty-print-object" atrributes="data">
+  <template>
+    <!-- shadow DOM here -->
+    <ul>
+      <template repeat="{{ key in filterKeys(data) }}">
+        <li><strong>{{key}}: </strong>
+          <template if="{{ !isArray(data[key]) }}">{{ data[key] }}</template>
+          <template if="{{ isArray(data[key]) }}">
+            <ul>
+              <template repeat="{{ value in data[key] }}">
+                <li>{{value}}</li>
+              </template>
+            </ul>
+          </template>
+        </li>
+      </template>
+    </ul>
+  </template>
+  <script>
+    Polymer('pretty-print-object',{
+      // properties and methods here
+      publish: {
+        data: {}
+      },
+      ready: function() {
+        // console.log('data',this.data);
+      },
+      isArray: function(o) {
+        return typeof o == "array" || (typeof o == "object" && o.constructor === Array);
+      },
+      attributeChanged: function(attrName, oldVal, newVal) {
+        // console.log(attrName, 'old: ' + oldVal, 'new:', newVal);
+      },
+      filterKeys: function(object) {
+        return Object.keys(object);
+      },
+      stringify: function(json){
+        return JSON.stringify(json)
+      }
+    });
+  </script>
+</polymer-element>

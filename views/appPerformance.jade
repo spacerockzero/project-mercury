@@ -2,6 +2,7 @@ extends layout
 
 
 block content
+  link( rel="import" href="/components/pretty-print-object/pretty-print-object.html" )
   br
   a.waves-effect.btn( href="/perf") < back
   h3= title
@@ -15,41 +16,16 @@ block content
           div.collapsible-body
             div.collapsible(data-collapsible='expandable')
               div
-                div.collapsible-header.truncate Quick Metrics
-                  i.mdi-content-add-box
-                  i.mdi-content-add-box
-                div.collapsible-body
-                  if rec.data.metrics
-                    //- # of requests
-                    div
-                      b 
-                        | # of requests: 
-                      | #{rec.data.metrics.requests}
-                    //- size of total download
-                    div
-                      b
-                        | Total download size: 
-                      | #{rec.data.metrics.bodySize}
-                    //- cache perfection
-                    div
-                      b Cache perfection:
-                      div oldCachingHeaders: #{rec.data.metrics.oldCachingHeaders} 
-                      div cachingDisabled: #{rec.data.metrics.cachingDisabled}
-                      div cachingTooShort: #{rec.data.metrics.cachingTooShort}
-                      div cachingNotSpecified: #{rec.data.metrics.cachingNotSpecified}
-                      div cachePasses: #{rec.data.metrics.cachePasses} 
-                      div cacheMisses: #{rec.data.metrics.cacheMisses} 
-                      div cacheHits: #{rec.data.metrics.cacheHits} 
-              div
                 div.collapsible-header.truncate Metrics
                   i.mdi-content-add-box
                   i.mdi-content-add-box
                 div.collapsible-body
                   if rec.data.metrics
-                    for key in Object.keys(rec.data.metrics)
-                      div.row
-                        div.col.s6 #{key}
-                        div.col.s6 #{rec.data.metrics[key]}
+                    pretty-print-object( data='#{ JSON.stringify(rec.data.metrics) }' )
+                    //- for key in Object.keys(rec.data.metrics)
+                    //-   div.row
+                    //-     div.col.s6 #{key}
+                    //-     div.col.s6 #{rec.data.metrics[key]}
               div
                 div.collapsible-header.truncate='Offenders'
                   i.mdi-content-add-box
@@ -57,14 +33,17 @@ block content
                 div.collapsible-body.col.s10.offset-2
                   if rec.data.offenders
                     ul.collapsible(data-collapsible='expandable')
-                      for key in Object.keys(rec.data.offenders)
-                        div
-                          div.collapsible-header.truncate #{key}
-                            i.mdi-content-add-box
-                            i.mdi-content-add-box
-                            i.mdi-content-add-box
-                          div.collapsible-body
-                            p #{JSON.stringify(rec.data.offenders[key])}
-                            //- each item in rec.data.offenders[key]
-                            //-   //- very slow loop, replace with on-demand client-side module
-                            //-   p #{item}
+                      //- pre= JSON.stringify(rec.data.offenders, undefined, 4)
+                      //- very slow loop, replace with on-demand client-side module?
+                      //- performance-offenders( items='#{ JSON.stringify({"banana":["val1","val2"],"somethingElse":"good","anotherThing":["thing1","thing2","thing3"]}) }' )
+                      pretty-print-object( data='#{ JSON.stringify(rec.data.offenders) }' )
+                      //- for key in Object.keys(rec.data.offenders)
+                      //-   div
+                      //-     div.collapsible-header.truncate #{key}
+                      //-       i.mdi-content-add-box
+                      //-       i.mdi-content-add-box
+                      //-       i.mdi-content-add-box
+                      //-     div.collapsible-body
+                      //-       //- p #{JSON.stringify(rec.data.offenders[key])}
+                      //-       each item in rec.data.offenders[key]
+                      //-         p #{item}

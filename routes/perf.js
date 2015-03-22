@@ -26,7 +26,7 @@ router.get('/run/:app', function(req, res, next) {
   var thisConfig = rules.standard;
   if(req.query.fssessionid) {
     console.log('fssessionid passed in');
-    thisConfig['cookie'] = 'fssessionid='+req.query.fssessionid+';domain=beta.familysearch.org';
+    thisConfig.cookie = 'fssessionid='+req.query.fssessionid+';domain=beta.familysearch.org';
   }
   console.log('thisConfig:',thisConfig);
   var urls = sites[req.params.app];
@@ -45,15 +45,15 @@ function runPerfTest(appName,site,config,cb){
   console.log('perftest site',site);
   console.log('perftest appName',appName);
   console.log('perftest config',config);
-  var config = config || rules.standard
+  config = config || rules.standard;
   config.url = site;
   console.log('config before run: ',config);
 
-  var task = phantomas(config.url,config)
+  var task = phantomas(config.url,config);
 
   task.then(function(res) {
     var thisResults = res.results;
-  	// console.log('res',res);
+    // console.log('res',res);
     console.log('Exit code: %d', res.code);
     console.log('res.json.url',res.json.url);
     var thisjson = {
@@ -69,12 +69,12 @@ function runPerfTest(appName,site,config,cb){
     if(cb) cb(); //don't wait for db to start next test
   }).
   fail(function(code) {
-  	console.log('FAIL: Exit code #%d', code);
+    console.log('FAIL: Exit code #%d', code);
     if(cb) cb();
-  	process.exit(code);
+    process.exit(code);
   }).
   progress(function(progress) {
-  	console.log('Loading progress: %d%', progress * 100);
+    console.log('Loading progress: %d%', progress * 100);
   }).
   done();
 }
@@ -110,29 +110,22 @@ router.get('/:appName', function(req, res, next) {
   });
 });
 
+
 // Prefetch the app records for this app
 router.param('appName', function(req, res, next, appName) {
-  // find all records that match the current app (very expensive and slow, too much data)
-  // Record.find({appName: appName},function(err, records){
-  //   console.log('err',err)
-  //   console.log('records.length',records.length)
-  //   // returns records[]
-  //   if(err) next(err);
-  //   res.locals.records = records;
-  //   next();
-  // });
 
   // get the last test record from each of the unique urls tested under current app (much faster)
   var urls = sites[appName];
   var appData = [];
   function getAppData(url,cb) {
     // get latest record matching this url:
-    var query = Record.findOne({url: url}, {}, { sort: { 'created_at': -1 }})
+    var query = Record.findOne({url: url}, {}, { sort: { 'created_at': -1 }});
     var promise = query.exec();
     promise.addBack(function(err, record){
       if(err) console.log('err',err);
+      record = minimizeData(record);
       // pushes record[]
-      appData.push(record)
+      appData.push(record);
       cb(err);
     });
   }
@@ -147,5 +140,55 @@ router.param('appName', function(req, res, next, appName) {
   });
 
 });
+
+
+function minimizeData(record) {
+  // pass on a much smaller record for the minimal results view
+  var smallData = {};
+
+  record.data.metrics = {
+    oldCachingHeaders: record.data.metrics.oldCachingHeaders || '',
+    cachingDisabled: record.data.metrics.cachingDisabled || '',
+    cachingTooShort: record.data.metrics.cachingTooShort || '',
+    cachingNotSpecified: record.data.metrics.cachingNotSpecified || '',
+    cachePasses: record.data.metrics.cachePasses || '',
+    cacheMisses: record.data.metrics.cacheMisses || '',
+    cacheHits: record.data.metrics.cacheHits || ''
+  };
+
+  record.data.offenders = {
+    biggestLatency: record.data.offenders.biggestLatency || '',
+    slowestResponse: record.data.offenders.slowestResponse || '',
+    biggestResponse: record.data.offenders.biggestResponse || '',
+    timeToFirstImage: record.data.offenders.timeToFirstImage || '',
+    timeToFirstJs: record.data.offenders.timeToFirstJs || '',
+    timeToFirstCss: record.data.offenders.timeToFirstCss || '',
+    assetsWithCookies: record.data.offenders.assetsWithCookies || '',
+    assetsNotGzipped: record.data.offenders.assetsNotGzipped || '',
+    redirects: record.data.offenders.redirects || '',
+    localStorageEntries: record.data.offenders.localStorageEntries || '',
+    documentWriteCalls: record.data.offenders.documentWriteCalls || '',
+    headersBiggerThanContent: record.data.offenders.headersBiggerThanContent || '',
+    globalVariables: record.data.offenders.globalVariables || '',
+    domains: record.data.offenders.domains || '',
+    imagesWithoutDimensions: record.data.offenders.imagesWithoutDimensions || '',
+    commentsSize: record.data.offenders.commentsSize || '',
+    domainsWithCookies: record.data.offenders.domainsWithCookies || '',
+    cachingDisabled: record.data.offenders.cachingDisabled || '',
+    cachingTooShort: record.data.offenders.cachingTooShort || '',
+    cachingNotSpecified: record.data.offenders.cachingNotSpecified || '',
+    cacheMisses: record.data.offenders.cacheMisses || '',
+    webfontCount: record.data.offenders.webfontCount || '',
+    imageCount: record.data.offenders.imageCount || '',
+    jsonCount: record.data.offenders.jsonCount || '',
+    jsCount: record.data.offenders.jsCount || '',
+    cssCount: record.data.offenders.cssCount || '',
+    htmlCount: record.data.offenders.htmlCount || '',
+    ajaxRequests: record.data.offenders.ajaxRequests || '',
+    postRequests: record.data.offenders.postRequests || ''
+  };
+  // record.data = smallData;
+  return record;
+}
 
 module.exports = router;

@@ -12,16 +12,16 @@ block content
     each rec in records
       if rec
         div.collapsible(data-collapsible='expandable')
-          div.collapsible-header.mdi-content-add-box.truncate= rec.url
+          div.collapsible-header.truncate= rec.url
             a.tooltipped.right.mdi-device-access-time( data-position="left" data-delay="50" data-tooltip="scanned on: #{rec.created_at.toDateString()}")
-            //- i
+            i.mdi-content-add-box.align-left.blue-text.text-lighten-2
           div.collapsible-body
             div.collapsible(data-collapsible='expandable')
               //- metrics summary section
               div
                 div.collapsible-header.truncate Metrics
                   //- i.mdi-content-add-box
-                  i.mdi-content-add-box
+                  i.mdi-av-equalizer.green-text.text-darken-1
                 div.collapsible-body
                   if rec.data.metrics
                     perf-metrics( data='#{ JSON.stringify(rec.data.metrics) }' )
@@ -33,8 +33,7 @@ block content
               //- offenders summary section
               div
                 div.collapsible-header.truncate='Offenders'
-                  //- i.mdi-content-add-box
-                  i.mdi-content-add-box
+                  i.align-left.mdi-alert-warning.red-text.text-darken-1
                 div.collapsible-body.col.s10.offset-2
                   if rec.data.offenders
                     ul.collapsible(data-collapsible='expandable')

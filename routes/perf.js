@@ -8,17 +8,90 @@ var mongoose = require('mongoose'),
     Record = require('../models/Record');
 
 
+
+/*
+   PUBLIC ROUTES
+   ========================================================================== */
+
+/* GET main performance data dashboard */
+router.get('/', function(req, res, next) {
+  // get distinct appNames
+  Record.distinct('appName',{},function(err, appNames){
+    // returns records[]
+    if(err) next(err);
+    res.render('perf',{
+      title: 'All Apps',
+      appNames: appNames
+    });
+  });
+});
+
+
+/* GET performance data dashboard for one app*/
+router.get('/:appName', function(req, res, next) {
+  res.render('appPerformance',{
+    title: req.params.appName + ' scan results',
+    records: res.locals.records
+  });
+});
+
+
+// Prefetch the app records for this app
+router.param('appName', function(req, res, next, appName) {
+  // get the last test record from each of the unique urls tested under current app (much faster)
+  var urls = sites[appName];
+  var appData = [];
+  function getAppData(url,cb) {
+    // get latest record matching this url:
+    var query = Record.findOne({url: url}, {}, { sort: { 'created_at': -1 }});
+    var promise = query.exec();
+    promise.addBack(function(err, record){
+      if(err) {
+        console.log('err',err);
+      }
+      else if(record) {
+        record = minimizeData(record);
+        // pushes record[]
+        appData.push(record);
+      }
+      cb(err);
+    });
+  }
+  urls.map(function(url){
+    getAppData(url,function(err){
+      if(err) next(err);
+      if(appData.length === urls.length) {
+        res.locals.records = appData.sort();
+        return next();
+      }
+    });
+  });
+});
+
+
+
+/*
+   TRIGGER PERF TESTS
+   ========================================================================== */
+
 /* POST webhook to start the perf test */
 router.post('/', function(req, res, next) {
+  // configured to match hook from github, whose repo name matches site
+  // array index for live site
   res.send('respond with a perf resource');
   console.log('req.repository.name',req.body.repository.name);
   console.log('rules.standard',rules.standard);
   var urls = sites[req.body.repository.name];
   console.log('urls',urls);
+  // TODO: change to serial map,
+  // a parallel map will crash on heroku.
+  // It's already fixed on the GET /run/ route
   urls.map(function(site){
     runPerfTest(req.body.repository.name,site);
   });
 });
+
+
 /* GET req to run scan on appname passed in, with optional query params */
 router.get('/run/:app', function(req, res, next) {
   console.log('req.param.app',req.params.app);
@@ -41,6 +114,12 @@ router.get('/run/:app', function(req, res, next) {
 });
 
 
+
+/*
+   FUNCTIONS
+   ========================================================================== */
+
+// run test and save it to the db
 function runPerfTest(appName,site,config,cb){
   console.log('perftest site',site);
   console.log('perftest appName',appName);
@@ -78,6 +157,7 @@ function runPerfTest(appName,site,config,cb){
   done();
 }
 
+
 function savePerfTest(appName,url,data,cb){
   if(appName && url && data){
     var newRecord = new Record({appName:appName, url:url, data:data});
@@ -88,68 +168,17 @@ function savePerfTest(appName,url,data,cb){
 }
 
 
-/* GET main performance data dashboard */
-router.get('/', function(req, res, next) {
-  // get distinct appNames
-  Record.distinct('appName',{},function(err, appNames){
-    // returns records[]
-    if(err) next(err);
-    res.render('perf',{
-      title: 'All Apps',
-      appNames: appNames
-    });
-  });
-});
-
-/* GET performance data dashboard for one app*/
-router.get('/:appName', function(req, res, next) {
-  res.render('appPerformance',{
-    title: 'App Performance by unique URL',
-    records: res.locals.records
-  });
-});
-
-
-// Prefetch the app records for this app
-router.param('appName', function(req, res, next, appName) {
-
-  // get the last test record from each of the unique urls tested under current app (much faster)
-  var urls = sites[appName];
-  var appData = [];
-  function getAppData(url,cb) {
-    // get latest record matching this url:
-    var query = Record.findOne({url: url}, {}, { sort: { 'created_at': -1 }});
-    var promise = query.exec();
-    promise.addBack(function(err, record){
-      if(err) {
-        console.log('err',err);
-      }
-      else if(record) {
-        record = minimizeData(record);
-        // pushes record[]
-        appData.push(record);
-      }
-      cb(err);
-    });
-  }
-  urls.map(function(url){
-    getAppData(url,function(err){
-      if(err) next(err);
-      if(appData.length === urls.length) {
-        res.locals.records = appData.sort();
-        return next();
-      }
-    });
-  });
-
-});
-
-
+// pass on a much smaller record for the minimal results view
 function minimizeData(record) {
-  // pass on a much smaller record for the minimal results view
   record.data.metrics = {
     requests: record.data.metrics.requests || '',
+    cssCount: record.data.metrics.cssCount || '',
+    jsCount: record.data.metrics.jsCount || '',
+    imageCount: record.data.metrics.imageCount || '',
     bodySize: record.data.metrics.bodySize || '',
+    cssSize: record.data.metrics.cssSize || '',
+    jsSize: record.data.metrics.jsSize || '',
+    imageSize: record.data.metrics.imageSize || '',
     oldCachingHeaders: record.data.metrics.oldCachingHeaders || '',
     cachingDisabled: record.data.metrics.cachingDisabled || '',
     cachingTooShort: record.data.metrics.cachingTooShort || '',
@@ -191,5 +220,6 @@ function minimizeData(record) {
   };
   return record;
 }
+
 
 module.exports = router;

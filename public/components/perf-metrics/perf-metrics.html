@@ -1,10 +1,11 @@
 <polymer-element name="perf-metrics" atrributes="data">
-  <template class="container">
+  <template>
     <!-- shadow DOM here -->
     <link rel="stylesheet" type="text/css" href="/components/materialize/dist/css/materialize.min.css">
     <style>
     </style>
-      <table class="striped">
+    <div class="container">
+      <table class="striped col s6">
         <tbody>
           <template repeat="{{ key in filterKeys(data) }}">
             <tr>
@@ -23,6 +24,7 @@
           </template>
         </tbody>
       </table>
+    </div>
   </template>
   <script>
     Polymer('perf-metrics',{

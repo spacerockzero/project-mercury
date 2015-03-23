@@ -8,19 +8,12 @@
       <table class="striped col s6">
         <tbody>
           <template repeat="{{ key in filterKeys(data) }}">
-            <tr>
-              <td><strong>{{key}}: </strong></td>
-              <template if="{{ !isArray(data[key]) }}">
+            <!-- <template if="{{ notEmpty(data[key]) }}"> -->
+              <tr>
+                <td><strong>{{key}}: </strong></td>
                 <td>{{ data[key] }}</td>
-              </template>
-              <template if="{{ isArray(data[key]) }}">
-                <td>
-                  <template repeat="{{ value in data[key] }}">
-                    <p>{{value}}</p>
-                  </template>
-                </td>
-              </template>
-            </tr>
+              </tr>
+            <!-- </template> -->
           </template>
         </tbody>
       </table>
@@ -46,6 +39,9 @@
       },
       stringify: function(json){
         return JSON.stringify(json)
+      },
+      notEmpty: function(val) {
+        return val !== '' && val !== 'undefined' && val !== null && val !== [] && val !== {};
       }
     });
   </script>

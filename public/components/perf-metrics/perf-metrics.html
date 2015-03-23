@@ -1,0 +1,50 @@
+<polymer-element name="perf-metrics" atrributes="data">
+  <template class="container">
+    <!-- shadow DOM here -->
+    <link rel="stylesheet" type="text/css" href="/components/materialize/dist/css/materialize.min.css">
+    <style>
+    </style>
+      <table class="striped">
+        <tbody>
+          <template repeat="{{ key in filterKeys(data) }}">
+            <tr>
+              <td><strong>{{key}}: </strong></td>
+              <template if="{{ !isArray(data[key]) }}">
+                <td>{{ data[key] }}</td>
+              </template>
+              <template if="{{ isArray(data[key]) }}">
+                <td>
+                  <template repeat="{{ value in data[key] }}">
+                    <p>{{value}}</p>
+                  </template>
+                </td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+  </template>
+  <script>
+    Polymer('perf-metrics',{
+      // properties and methods here
+      publish: {
+        data: {}
+      },
+      ready: function() {
+        // console.log('data',this.data);
+      },
+      isArray: function(o) {
+        return typeof o == "array" || (typeof o == "object" && o.constructor === Array);
+      },
+      attributeChanged: function(attrName, oldVal, newVal) {
+        // console.log(attrName, 'old: ' + oldVal, 'new:', newVal);
+      },
+      filterKeys: function(object) {
+        return Object.keys(object);
+      },
+      stringify: function(json){
+        return JSON.stringify(json)
+      }
+    });
+  </script>
+</polymer-element>

@@ -10,7 +10,7 @@ html(lang="en")
     link( rel='stylesheet', href='/stylesheets/style.css')
     script( src="/components/webcomponentsjs/webcomponents.js" )
     link( rel="import" href="/components/polymer/polymer.html" )
-  body
+  body.unresolved
     nav
       div.nav-wrapper.red
         i.mdi-image-flash-on.left.text-yellow
@@ -20,3 +20,4 @@ html(lang="en")
       block content
       script(src='/components/jquery/dist/jquery.min.js')
       script(src='/components/materialize/dist/js/materialize.min.js')
+      script( src="/components/time-elements/time-elements.js")

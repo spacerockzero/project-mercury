@@ -1,6 +1,31 @@
-<polymer-element name="pretty-print-object" atrributes="data">
-  <template>
+<polymer-element name="perf-offenders" atrributes="data">
+  <template class="container">
     <!-- shadow DOM here -->
+    <link rel="stylesheet" type="text/css" href="/components/materialize/dist/css/materialize.min.css">
+    <style>
+      ul {
+        margin-bottom: 1em;
+        padding-left: 1em;
+      }
+      ul > li > ul {
+        padding-left: 1em;
+      }
+    </style>
+    <!-- <template if="{{ isArray(data[key]) }}">
+      <ul>
+        <template repeat="{{ key in filterKeys(data) }}">
+          <li><strong>{{key}}: </strong>
+            <template if="{{ isArray(data[key]) }}">
+              <ul>
+                <template repeat="{{ value in data[key] }}">
+                  <li>{{value}}</li>
+                </template>
+              </ul>
+            </template>
+          </li>
+        </template>
+      </ul>
+    </template> -->
     <ul>
       <template repeat="{{ key in filterKeys(data) }}">
         <li><strong>{{key}}: </strong>
@@ -17,7 +42,7 @@
     </ul>
   </template>
   <script>
-    Polymer('pretty-print-object',{
+    Polymer('perf-offenders',{
       // properties and methods here
       publish: {
         data: {}

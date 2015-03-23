@@ -2,7 +2,8 @@ extends layout
 
 
 block content
-  link( rel="import" href="/components/pretty-print-object/pretty-print-object.html" )
+  link( rel="import" href="/components/perf-metrics/perf-metrics.html" )
+  link( rel="import" href="/components/perf-offenders/perf-offenders.html" )
   br
   a.waves-effect.btn( href="/perf") < back
   h3= title
@@ -11,11 +12,11 @@ block content
     each rec in records
       if rec
         div.collapsible(data-collapsible='expandable')
-          div.collapsible-header.truncate= rec.url
-            //- i.mdi-content-add-box
+          div.collapsible-header.mdi-content-add-box.truncate= rec.url
+            a.tooltipped.right.mdi-device-access-time( data-position="left" data-delay="50" data-tooltip="scanned on: #{rec.created_at.toDateString()}")
+            //- i
           div.collapsible-body
             div.collapsible(data-collapsible='expandable')
-
               //- metrics summary section
               div
                 div.collapsible-header.truncate Metrics
@@ -23,7 +24,7 @@ block content
                   i.mdi-content-add-box
                 div.collapsible-body
                   if rec.data.metrics
-                    pretty-print-object( data='#{ JSON.stringify(rec.data.metrics) }' )
+                    perf-metrics( data='#{ JSON.stringify(rec.data.metrics) }' )
                     //- for key in Object.keys(rec.data.metrics)
                     //-   div.row
                     //-     div.col.s6 #{key}
@@ -39,7 +40,7 @@ block content
                     ul.collapsible(data-collapsible='expandable')
                       //- performance-offenders( items='#{ JSON.stringify({"banana":["val1","val2"],"somethingElse":"good","anotherThing":["thing1","thing2","thing3"]}) }' )
                       //- very slow loop, replace with on-demand client-side module?
-                      pretty-print-object( data='#{ JSON.stringify(rec.data.offenders) }' )
+                      perf-offenders( data='#{ JSON.stringify(rec.data.offenders) }' )
                       //- for key in Object.keys(rec.data.offenders)
                       //-   div
                       //-     div.collapsible-header.truncate #{key}

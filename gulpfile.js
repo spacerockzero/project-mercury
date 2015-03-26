@@ -24,7 +24,7 @@ var webCompBundle = [
   './public/components/polymer/polymer.html',
   './public/components/polymer/layout.html',
   './public/components/perf-metrics/perf-metrics.html',
-  './public/components/perf-metrics/perf-offenders.html',
+  './public/components/perf-offenders/perf-offenders.html',
 ];
 
 gulp.task('stylus', function () {
@@ -45,11 +45,13 @@ gulp.task('js-bundle',function(){
 });
 
 gulp.task('webcomponents',function(){
+  var destDir = 'public/webcomponents';
   return gulp.src(webCompBundle)
     .pipe(vulcanize({
-      dest:'public/webcomponents',
+      dest:destDir,
       strip: true
     }))
+    .pipe(gulp.dest(destDir))
     .pipe(notify('Webcomponents Bundle Vulcanized!'));
 });
 

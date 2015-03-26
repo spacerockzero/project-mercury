@@ -42,7 +42,7 @@ module.exports = {
   ],
   'search': [
     'https://beta.familysearch.org/search/',
-    'https://beta.familysearch.org/search/record/results?count=20&query=%2Bgivenname%3Asteve~',
+    'https://beta.familysearch.org/search/record/results?count=20&query=%2Bgivenname%3Asteve',
     'https://beta.familysearch.org/ark:/61903/1:1:VR29-SVH',
     'https://beta.familysearch.org/pal:/MM9.3.1/TH-1971-27754-1287-21?cc=2000219'
   ]

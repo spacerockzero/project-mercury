@@ -4,8 +4,10 @@ var async = require('async');
 var phantomas = require('phantomas');
 var sites = require('../config/sites');
 var rules = require('../config/rules');
-var mongoose = require('mongoose'),
-    Record = require('../models/Record');
+var mongoose = require('mongoose');
+var Record = require('../models/Record');
+var escape = require('escape-html');
+var debug = require('debug')('perf');
 
 
 
@@ -15,10 +17,15 @@ var mongoose = require('mongoose'),
 
 /* GET main performance data dashboard */
 router.get('/', function(req, res, next) {
+  debug('get index');
   // get distinct appNames
   Record.distinct('appName',{},function(err, appNames){
+    debug('get distinct appNames:',appNames);
     // returns records[]
-    if(err) next(err);
+    if(err) {
+      debug('get distinct appNames ERROR:',err);
+      return next(err);
+    }
     res.render('perf',{
       title: 'All Apps',
       appNames: appNames
@@ -29,44 +36,84 @@ router.get('/', function(req, res, next) {
 
 /* GET performance data dashboard for one app*/
 router.get('/:appName', function(req, res, next) {
-  res.render('appPerformance',{
-    title: req.params.appName + ' scan results',
-    records: res.locals.records
-  });
+  if(res.locals.records){
+    res.render('appPerformance',{
+      title: req.params.appName + ' scan results',
+      records: res.locals.records
+    });
+  }
+  else {
+    console.error('ERROR: perf.js: get:appName');
+    return next();
+  }
 });
 
 
 // Prefetch the app records for this app
 router.param('appName', function(req, res, next, appName) {
+  debug('appName param, appName:',appName);
   // get the last test record from each of the unique urls tested under current app (much faster)
   var urls = sites[appName];
   var appData = [];
+
   function getAppData(url,cb) {
+    debug('appName param, url:',url);
     // get latest record matching this url:
-    var query = Record.findOne({url: url}, {}, { sort: { 'created_at': -1 }});
+    var query = Record.find({url: url},{}).limit(1);
     var promise = query.exec();
-    promise.addBack(function(err, record){
+    promise.addBack(function(err, records){
+      debug('appName param, db query returns. record[0], err:',records[0],err);
       if(err) {
+        debug('appName param, db query returns. if (err):',err);
         console.log('err',err);
+        return next(err);
       }
-      else if(record) {
-        record = minimizeData(record);
-        // pushes record[]
-        appData.push(record);
+      else if(records[0]) {
+        debug('appName param, db query returns. if (records[0]):');
+        records = minimizeData(records[0]);
+        // pushes records[]
+        appData.push(records);
       }
-      cb(err);
+      else {
+        debug('appName param, db returns no object. else');
+      }
+      return cb(err);
     });
   }
-  urls.map(function(url){
-    getAppData(url,function(err){
-      if(err) next(err);
-      if(appData.length === urls.length) {
-        res.locals.records = appData.sort();
-        return next();
-      }
+  // get urls
+  getDistinctUrls(appName,function(err,distinctUrls){
+    if(err) return console.error('ERROR: getDistinctUrls, err:',err);
+    // map them
+    distinctUrls.map(function(url,arrElem){
+      getAppData(url,function(err){
+        debug('param appName, urls.map callback, arrElem, urls.length:',arrElem,urls.length);
+        if(err) {
+          console.error('ERROR: perf.js: getAppData()');
+          return next(err);
+        }
+        if(arrElem === urls.length-1) {
+          res.locals.records = appData.sort();
+          return next();
+        }
+      });
     });
   });
 });
+
+function getDistinctUrls(appName,cb) {
+  debug('getDistinctUrls: appName',appName);
+  // get distinct appNames
+  Record.distinct('url',{'appName':appName},function(err, distinctUrls){
+    debug('getDistinctUrls: for:',appName);
+    // returns records[]
+    if(err) {
+      console.error('getDistinctUrls: ERROR:',err);
+      cb(err);
+    }
+    debug('getDistinctUrls, distinctUrls',distinctUrls);
+    cb(err,distinctUrls);
+  });
+}
 
 
 
@@ -78,37 +125,41 @@ router.param('appName', function(req, res, next, appName) {
 router.post('/', function(req, res, next) {
   // configured to match hook from github, whose repo name matches site
   // array index for live site
+  // doesn't have an automated way to get a sessionId,
+  // so right now this only works for non-auth pages
   res.send('respond with a perf resource');
   console.log('req.repository.name',req.body.repository.name);
   console.log('rules.standard',rules.standard);
   var urls = sites[req.body.repository.name];
   console.log('urls',urls);
-  // TODO: change to serial map,
-  // a parallel map will crash on heroku.
   // It's already fixed on the GET /run/ route
-  urls.map(function(site){
-    runPerfTest(req.body.repository.name,site);
+  async.mapSeries(urls,function(site,callback){
+    runPerfTest(req.body.repository.name,site,thisConfig,callback);
+  },function(err, results){
+    if(err) console.error('ERROR: async error ',err);
   });
+  res.send('running perf tests on ' + req.body.repository.name);
 });
 
 
 /* GET req to run scan on appname passed in, with optional query params */
 router.get('/run/:app', function(req, res, next) {
-  console.log('req.param.app',req.params.app);
-  console.log('rules.standard',rules.standard);
+  debug('/run/:app, req.param.app',req.params.app);
+  debug('/run/:app, rules.standard',rules.standard);
   var thisConfig = rules.standard;
   if(req.query.fssessionid) {
-    console.log('fssessionid passed in');
+    debug('/run/:app, fssessionid passed in');
     thisConfig.cookie = 'fssessionid='+req.query.fssessionid+';domain=beta.familysearch.org';
   }
-  console.log('thisConfig:',thisConfig);
+  debug('/run/:app, thisConfig:',thisConfig);
   var urls = sites[req.params.app];
-  console.log('urls',urls);
+  debug('/run/:app, urls',urls);
   // map the perf test functions in serial, so the server doesn't get overwhelmed
   async.mapSeries(urls,function(site,callback){
     runPerfTest(req.params.app,site,thisConfig,callback);
   },function(err, results){
     if(err) console.error('ERROR: async error ',err);
+    debug('/run/:app, done running tests, err:',err);
   });
   res.send('running perf tests on ' + req.params.app);
 });
@@ -121,30 +172,36 @@ router.get('/run/:app', function(req, res, next) {
 
 // run test and save it to the db
 function runPerfTest(appName,site,config,cb){
-  console.log('perftest site',site);
-  console.log('perftest appName',appName);
-  console.log('perftest config',config);
+  debug('runPerfTest(): perftest site',site);
+  debug('runPerfTest(): perftest appName',appName);
+  debug('runPerfTest(): perftest config',config);
   config = config || rules.standard;
   config.url = site;
-  console.log('config before run: ',config);
+  debug('runPerfTest(): config before run: ',config);
 
   var task = phantomas(config.url,config);
 
   task.then(function(res) {
     var thisResults = res.results;
-    // console.log('res',res);
-    console.log('Exit code: %d', res.code);
-    console.log('res.json.url',res.json.url);
+    // debug('res',res);
+    debug('Exit code: %d', res.code);
+    debug('res.json.url',res.json.url);
     var thisjson = {
       metrics: res.results.getMetrics(),
       offenders: res.results.getAllOffenders()
     };
-    savePerfTest(appName,res.json.url,thisjson,function(err, record){
-      console.log('err: ',err);
-      console.log('record saved:',res.json.url);
-      thisjson = null;
+    var thisUrl = escape(res.json.url);
+    savePerfTest(appName,thisUrl,thisjson,function(err, record){
+      if(err){
+        console.log('ERROR: saving test to db err: ',err);
+        if(cb) cb();
+      }
+      else {
+        console.log('record saved to db:',thisUrl);
+        thisjson = null;
+        if(cb) cb(); //don't wait for db to start next test
+      }
     });
-    if(cb) cb(); //don't wait for db to start next test
   }).
   fail(function(code) {
     console.log('FAIL: Exit code #%d', code);

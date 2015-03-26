@@ -45,7 +45,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'),{
   maxage: process.env.ASSET_EXPIRES || 0
-  // maxage: '86400'
 }));
 
 // set browser caching on GETs

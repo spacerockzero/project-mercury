@@ -173,7 +173,7 @@ router.get('/run/:app', function(req, res, next) {
 
 // run test and save it to the db
 function runPerfTest(appName,site,config,cb){
-  debug('runPerfTest(): perftest site',site);
+  console.log('runPerfTest(): perftest site',site);
   debug('runPerfTest(): perftest appName',appName);
   debug('runPerfTest(): perftest config',config);
   config = config || rules.standard;

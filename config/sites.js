@@ -44,6 +44,13 @@ module.exports = {
     'https://beta.familysearch.org/search/',
     'https://beta.familysearch.org/search/record/results?count=20&query=%2Bgivenname%3Asteve',
     'https://beta.familysearch.org/ark:/61903/1:1:VR29-SVH',
-    'https://beta.familysearch.org/pal:/MM9.3.1/TH-1971-27754-1287-21?cc=2000219'
+    'https://beta.familysearch.org/pal:/MM9.3.1/TH-1971-27754-1287-21?cc=2000219',
+    'https://beta.familysearch.org/family-trees',
+    'https://beta.familysearch.org/catalog-search',
+    'https://beta.familysearch.org/learn/wiki/en/Main_Page'
+  ],
+  'my-booklet': [
+    'https://beta.familysearch.org/myfamily/booklet/#/R',
+    'https://beta.familysearch.org/myfamily/booklet/finish-page#/'
   ]
 };

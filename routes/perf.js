@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var Record = require('../models/Record');
 var escape = require('escape-html');
 var debug = require('debug')('perf');
+var debugRecord = require('debug')('perf:records');
 
 
 
@@ -62,7 +63,6 @@ router.param('appName', function(req, res, next, appName) {
     var query = Record.find({url: url},{}).limit(1);
     var promise = query.exec();
     promise.addBack(function(err, records){
-      debug('appName param, db query returns. record[0], err:',records[0],err);
       if(err) {
         debug('appName param, db query returns. if (err):',err);
         console.log('err',err);
@@ -70,6 +70,7 @@ router.param('appName', function(req, res, next, appName) {
       }
       else if(records[0]) {
         debug('appName param, db query returns. if (records[0]):');
+        debugRecord('appName param, db query returns. if (records[0]):',records[0]);
         records = minimizeData(records[0]);
         // pushes records[]
         appData.push(records);
@@ -112,7 +113,7 @@ function getDistinctUrls(appName,cb) {
     }
     debug('getDistinctUrls, distinctUrls',distinctUrls);
     cb(err,distinctUrls);
-  });
+  }).lean(true);
 }
 
 
@@ -190,7 +191,8 @@ function runPerfTest(appName,site,config,cb){
       metrics: res.results.getMetrics(),
       offenders: res.results.getAllOffenders()
     };
-    var thisUrl = escape(res.json.url);
+    // var thisUrl = escape(res.json.url);
+    var thisUrl = res.json.url;
     savePerfTest(appName,thisUrl,thisjson,function(err, record){
       if(err){
         console.log('ERROR: saving test to db err: ',err);

@@ -6,9 +6,8 @@ html(lang="en")
     title= title
     meta( name="description" content="")
     meta( name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes" )
-    link( rel='stylesheet', href='/components/materialize/dist/css/materialize.min.css')
-    link( rel='stylesheet', href='/stylesheets/style.css')
-    script( src="/components/webcomponentsjs/webcomponents.js" )
+    link( rel='stylesheet', href='/stylesheets/main.min.css' )
+    script( src="/components/webcomponentsjs/webcomponents-lite.min.js" )
     link( rel="import" href="/components/polymer/polymer.html" )
   body.unresolved
     nav
@@ -18,5 +17,6 @@ html(lang="en")
         i.mdi-image-flash-on.right.text-yellow
     div.container
       block content
-      script(src='/components/jquery/dist/jquery.min.js')
-      script(src='/components/materialize/dist/js/materialize.min.js')
+      //- script(src='/components/jquery/dist/jquery.min.js')
+      //- script(src='/components/materialize/dist/js/materialize.min.js')
+      script( src="/javascripts/app.min.js" )

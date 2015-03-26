@@ -11,7 +11,7 @@
   },
   "private": false,
   "scripts": {
-    "start": "node ./bin/www --debug"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "async": "^0.9.0",
@@ -38,5 +38,20 @@
     "webperf"
   ],
   "author": "Jakob Anderson",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "browser-sync": "^2.4.0",
+    "gulp": "^3.8.11",
+    "gulp-autoprefixer": "^2.1.0",
+    "gulp-concat": "^2.5.2",
+    "gulp-minify-css": "^1.0.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-stylus": "^2.0.1",
+    "gulp-uglify": "^1.1.0",
+    "gulp-uglifyjs": "^0.6.1",
+    "gulp-util": "^3.0.4",
+    "gulp-vulcanize": "^5.0.0",
+    "gulp-watch": "^4.2.0"
+  }
 }

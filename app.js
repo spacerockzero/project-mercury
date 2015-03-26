@@ -45,6 +45,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'),{
   maxage: process.env.ASSET_EXPIRES || 0
+  // maxage: '86400'
 }));
 
 // set browser caching on GETs
@@ -53,8 +54,8 @@ app.use(function (req, res, next) {
   // if (! ('JSONResponcs' in res) ) {
   //   return next();
   // }
-  var expires = process.env.API_EXPIRES || 0;
-  res.setHeader('Cache-Control', 'public, max-age=' + expires);
+  var apiExpires = process.env.API_EXPIRES || 0;
+  res.setHeader('Cache-Control', 'public, max-age=' + apiExpires);
   return next();
 });
 

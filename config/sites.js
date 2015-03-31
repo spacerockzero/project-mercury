@@ -54,8 +54,8 @@ module.exports = {
     'https://beta.familysearch.org/myfamily/booklet/finish-page#/'
   ],
   'indexing': [
-    'https://beta.familysearch.org/indexing',
-    'https://beta.familysearch.org/indexing/projects',
-    'https://beta.familysearch.org/indexing/help'
+    'https://beta.familysearch.org/indexing/',
+    'https://beta.familysearch.org/indexing/projects/',
+    'https://beta.familysearch.org/indexing/help/'
   ]
 };

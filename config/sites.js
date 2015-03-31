@@ -52,5 +52,10 @@ module.exports = {
   'my-booklet': [
     'https://beta.familysearch.org/myfamily/booklet/#/R',
     'https://beta.familysearch.org/myfamily/booklet/finish-page#/'
+  ],
+  'indexing': [
+    'https://beta.familysearch.org/indexing',
+    'https://beta.familysearch.org/indexing/projects',
+    'https://beta.familysearch.org/indexing/help'
   ]
 };

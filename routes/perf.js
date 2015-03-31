@@ -65,11 +65,12 @@ router.param('appName', function(req, res, next, appName) {
     promise.addBack(function(err, records){
       if(err) {
         debug('appName param, db query returns. if (err):',err);
-        console.log('err',err);
-        return next(err);
+        console.log('ERROR: appName param, db query returns:',err);
+        return cb(err);
       }
       else if(records[0]) {
         debug('appName param, db query returns. if (records[0]):');
+        debug('appName param, db query returns. if (records[0]).url:',records[0].url);
         debugRecord('appName param, db query returns. if (records[0]):',records[0]);
         records = minimizeData(records[0]);
         // pushes records[]
@@ -87,12 +88,13 @@ router.param('appName', function(req, res, next, appName) {
     // map them
     distinctUrls.map(function(url,arrElem){
       getAppData(url,function(err){
-        debug('param appName, urls.map callback, arrElem, urls.length:',arrElem,urls.length);
+        debug('param appName, urls.map callback, arrElem, urls.length:',arrElem,distinctUrls.length);
         if(err) {
           console.error('ERROR: perf.js: getAppData()');
           return next(err);
         }
-        if(arrElem === urls.length-1) {
+        if(arrElem === distinctUrls.length-1) {
+          debug('url param callback, arrElem, urls.length-1',arrElem,distinctUrls.length-1)
           res.locals.records = appData.sort();
           return next();
         }

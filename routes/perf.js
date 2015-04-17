@@ -1,14 +1,15 @@
-var express = require('express');
-var router = express.Router();
-var async = require('async');
-var phantomas = require('phantomas');
-var sites = require('../config/sites');
-var rules = require('../config/rules');
-var mongoose = require('mongoose');
-var Record = require('../models/Record');
-var escape = require('escape-html');
-var debug = require('debug')('perf');
-var debugRecord = require('debug')('perf:records');
+
+var express     = require('express'),
+    router      = express.Router(),
+    async       = require('async'),
+    phantomas   = require('phantomas'),
+    sites       = require('../config/sites'),
+    rules       = require('../config/rules'),
+    mongoose    = require('mongoose'),
+    Record      = require('../models/Record'),
+    escape      = require('escape-html'),
+    debug       = require('debug')('perf'),
+    debugRecord = require('debug')('perf:records');
 
 
 
@@ -144,6 +145,28 @@ router.post('/', function(req, res, next) {
   res.send('running perf tests on ' + req.body.repository.name);
 });
 
+/* get req to run scan on all apps, with optional query params */
+router.get('/run/all', function(req, res, next) {
+  debug('/run/all');
+  debug('/run/all, rules.standard', rules.standard);
+  var thisConfig = rules.standard;
+  if(req.query.fssessionid) {
+    debug('/run/all, fssessionid passed in');
+    thisConfig.cookie = 'fssessionid='+req.query.fssessionid+';domain=beta.familysearch.org';
+  }
+  debug('/run/all, thisConfig:',thisConfig);
+  var thisSites = sites;
+  debug('/run/all, thisSites',thisSites);
+  // var mainSites = [];
+  // for (var k in thisKeys) {
+  //   mainSites.push(k);
+  // }
+
+  async.mapSeries(Object.keys(thisSites),function(site,callback){
+    perfTestSite(site,thisSites[site],thisConfig,callback);
+  });
+  res.send('running perf tests on all apps');
+});
 
 /* GET req to run scan on appname passed in, with optional query params */
 router.get('/run/:app', function(req, res, next) {
@@ -172,6 +195,21 @@ router.get('/run/:app', function(req, res, next) {
 /*
    FUNCTIONS
    ========================================================================== */
+// run perf test on all urls for a site
+function perfTestSite(app,sites,thisConfig,cb){
+  console.log('/run, perfTestSite(), app',app);
+  debug('/run, perfTestSite(), sites',sites);
+  debug('/run, perfTestSite(), thisConfig',thisConfig);
+  // var urls = sites[app];
+  async.mapSeries(sites,function(site,callback){
+    runPerfTest(app,site,thisConfig,callback);
+  },function(err, results){
+    if(err) console.error('ERROR: async error ',err);
+    debug('/run/:app, done running tests, err:',err);
+    if(cb) cb();
+  });
+}
+
 
 // run test and save it to the db
 function runPerfTest(appName,site,config,cb){

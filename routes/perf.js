@@ -154,6 +154,11 @@ router.get('/run/all', function(req, res, next) {
     debug('/run/all, fssessionid passed in');
     thisConfig.cookie = 'fssessionid='+req.query.fssessionid+';domain=beta.familysearch.org';
   }
+  // refresh token requires a session to exist
+  if(req.query.fsrefreshtoken && req.query.fssessionid) {
+    debug('/run/all, fsrefreshtoken passed in');
+    thisConfig.cookie += ';fsrefreshtoken='+req.query.fsrefreshtoken+';domain=beta.familysearch.org';
+  }
   debug('/run/all, thisConfig:',thisConfig);
   var thisSites = sites;
   debug('/run/all, thisSites',thisSites);

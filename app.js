@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'development' && process.env.PING_URL) {
   // this app uses a self-ping to run regular test jobs and keep the app from sleeping in prod
   // pass the ping options via env variables
   var pingOptions = {
-    interval: process.env.PING_INTERVAL || 45 * 60 * 1000,   // default 45 * 60 * 1000
+    interval: process.env.PING_INTERVAL || 45 * 60 * 1000,   // default 45 * 60 * 1000 in ms
     // logger: process.env.PING_LOGGER || 'console.log'     // default: console.log
   };
   if(process.env.PING_VERBOSE !== 'FALSE'){

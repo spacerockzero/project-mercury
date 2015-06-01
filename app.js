@@ -7,19 +7,19 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-// self-ping only in prod
-if (process.env.NODE_ENV !== 'development' && process.env.PING_URL) {
-  // this app uses a self-ping to run regular test jobs and keep the app from sleeping in prod
-  // pass the ping options via env variables
-  var pingOptions = {
-    interval: process.env.PING_INTERVAL || 45 * 60 * 1000,   // default 45 * 60 * 1000 in ms
-    // logger: process.env.PING_LOGGER || 'console.log'     // default: console.log
-  };
-  if(process.env.PING_VERBOSE !== 'FALSE'){
-    pingOptions.verbose = true;
-  }
-  var ping = require('heroku-self-ping')(process.env.PING_URL || false, pingOptions);
-}
+// // self-ping only in prod
+// if (process.env.NODE_ENV !== 'development' && process.env.PING_URL) {
+//   // this app uses a self-ping to run regular test jobs and keep the app from sleeping in prod
+//   // pass the ping options via env variables
+//   var pingOptions = {
+//     interval: process.env.PING_INTERVAL || 45 * 60 * 1000,   // default 45 * 60 * 1000 in ms
+//     // logger: process.env.PING_LOGGER || 'console.log'     // default: console.log
+//   };
+//   if(process.env.PING_VERBOSE !== 'FALSE'){
+//     pingOptions.verbose = true;
+//   }
+//   var ping = require('heroku-self-ping')(process.env.PING_URL || false, pingOptions);
+// }
 
 var routes = require('./routes/index');
 var perf = require('./routes/perf');

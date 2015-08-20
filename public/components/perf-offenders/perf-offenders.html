@@ -1,74 +1,86 @@
-<polymer-element name="perf-offenders" atrributes="data">
+<link rel="import" href="/components/polymer/polymer.html">
+
+<dom-module id="perf-offenders">
+  <style>
+    ul {
+      margin: 0 auto 1em;
+      padding-left: 1em;
+    }
+    ul ul {
+      padding-left: 1em;
+    }
+    ul li {
+      margin-bottom:1em;
+    }
+    ul.bulleted li{
+      list-style-type: square !important;
+    }
+  </style>
   <template class="container">
     <!-- shadow DOM here -->
-    <link rel="stylesheet" type="text/css" href="/components/materialize/dist/css/materialize.min.css">
-    <style>
-      ul {
-        margin: 0 auto 1em;
-        padding-left: 1em;
-      }
-      ul ul {
-        padding-left: 1em;
-      }
-      ul li {
-        margin-bottom:1em;
-      }
-      ul.bulleted li{
-        list-style-type: square !important;
-      }
-    </style>
     <div class="row">
-      <template repeat="{{ key in filterKeys(data) }}">
-        <template if="{{ notEmpty(data[key]) }}">
+      <template is="dom-repeat" items="{{_toArray(data)}}">
+        <template is="dom-if" if="{{notEmpty(item)}}">
           <div class="col s12">
             <div class="card blue-grey lighten-1 z-depth-2">
               <div class="card-content white-text">
-                <span class="card-title">{{key}}</span>
+                <span class="card-title">{{item.name}}</span>
                 <p>
-                  <template if="{{ !isArray(data[key]) }}">{{ data[key] }}</template>
-                  <template if="{{ isArray(data[key]) }}">
+                  <template is="dom-if" if="{{!isArray(item.value)}}">{{item.name}}</template>
+                  <template is="dom-if" if="{{isArray(item.value)}}">
                     <ul class="bulleted">
-                      <template repeat="{{ value in data[key] }}">
-                        <li class="bulleted">{{value}}</li>
+                      <template is="dom-repeat" items="{{_toArray(item.value)}}">
+                        <li class="bulleted">{{item.value}}</li>
                       </template>
                     </ul>
                   </template>
                 </p>
               </div>
-              <!-- <div class="card-action">
-                <a href="#">This is a link</a>
-                <a href='#'>This is a link</a>
-              </div> -->
             </div>
           </div>
         </template>
       </template>
     </div>
   </template>
-  <script>
-    Polymer('perf-offenders',{
-      // properties and methods here
-      publish: {
-        data: {}
-      },
-      ready: function() {
-        // console.log('data',this.data);
-      },
-      isArray: function(o) {
-        return typeof o == "array" || (typeof o == "object" && o.constructor === Array);
-      },
-      attributeChanged: function(attrName, oldVal, newVal) {
-        // console.log(attrName, 'old: ' + oldVal, 'new:', newVal);
-      },
-      filterKeys: function(object) {
-        return Object.keys(object);
-      },
-      stringify: function(json){
-        return JSON.stringify(json)
-      },
-      notEmpty: function(val) {
-        return val !== '' && val !== 'undefined' && val !== null;
+</dom-module>
+<script>
+  Polymer({
+    is: 'perf-offenders',
+    // properties and methods here
+    properties: {
+      data: {}
+    },
+    ready: function() {
+      // console.log('data',this.data);
+    },
+    isArray: function(o) {
+      return typeof o == "array" || (typeof o == "object" && o.constructor === Array);
+    },
+    isString: function(s) {
+      return typeof s == 'string';
+    },
+    attributeChanged: function(attrName, oldVal, newVal) {
+    },
+    _toArray: function(obj) {
+      if(this.isString(obj)) {
+        obj = this.unstringify(obj);
       }
-    });
-  </script>
-</polymer-element>
+      return Object.keys(obj).map(function(key) {
+        return {name: key, value: obj[key]};
+      });
+    },
+    filterKeys: function(object) {
+      return Object.keys(object);
+    },
+    stringify: function(json){
+      return JSON.stringify(json)
+    },
+    unstringify: function(s) {
+      return JSON.parse(s);
+    },
+    notEmpty: function(val) {
+      console.log('notEmpty:',val);
+      return val !== '' && val !== 'undefined' && val !== null;
+    }
+  });
+</script>

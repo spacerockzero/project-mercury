@@ -19,5 +19,9 @@
     "chartjs": "~1.0.1",
     "materialize": "~0.95.2",
     "polymer": "Polymer/polymer#~0.5.5"
+  },
+  "resolutions": {
+    "polymer": "~1.1.0",
+    "webcomponentsjs": "^0.7.2"
   }
 }

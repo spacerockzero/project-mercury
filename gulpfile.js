@@ -21,10 +21,10 @@ var jsBundle = [
   './public/components/materialize/dist/js/materialize.min.js'
 ];
 var webCompBundle = [
-  './public/components/polymer/polymer.html',
-  './public/components/polymer/layout.html',
+  //'./public/components/polymer/polymer.html',
+  //'./public/components/polymer/layout.html',
   './public/components/perf-metrics/perf-metrics.html',
-  './public/components/perf-offenders/perf-offenders.html',
+  './public/components/perf-offenders/perf-offenders.html'
 ];
 
 gulp.task('stylus', function () {

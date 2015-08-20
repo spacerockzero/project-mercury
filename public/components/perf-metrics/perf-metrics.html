@@ -1,17 +1,18 @@
-<polymer-element name="perf-metrics" atrributes="data">
+<link rel="import" href="/components/polymer/polymer.html">
+
+<dom-module id="perf-metrics">
+  <style>
+  </style>
   <template>
     <!-- shadow DOM here -->
-    <link rel="stylesheet" type="text/css" href="/components/materialize/dist/css/materialize.min.css">
-    <style>
-    </style>
     <div class="container">
       <table class="striped col s6">
         <tbody>
-          <template repeat="{{ key in filterKeys(data) }}">
+          <template is="dom-repeat" items="{{_toArray(data)}}">
             <!-- <template if="{{ notEmpty(data[key]) }}"> -->
               <tr>
-                <td><strong>{{key}}: </strong></td>
-                <td>{{ data[key] }}</td>
+                <td><strong><span>{{item.name}}</span>: </strong></td>
+                <td>{{item.value}}</td>
               </tr>
             <!-- </template> -->
           </template>
@@ -19,30 +20,41 @@
       </table>
     </div>
   </template>
-  <script>
-    Polymer('perf-metrics',{
-      // properties and methods here
-      publish: {
-        data: {}
-      },
-      ready: function() {
-        // console.log('data',this.data);
-      },
-      isArray: function(o) {
-        return typeof o == "array" || (typeof o == "object" && o.constructor === Array);
-      },
-      attributeChanged: function(attrName, oldVal, newVal) {
-        // console.log(attrName, 'old: ' + oldVal, 'new:', newVal);
-      },
-      filterKeys: function(object) {
-        return Object.keys(object);
-      },
-      stringify: function(json){
-        return JSON.stringify(json)
-      },
-      notEmpty: function(val) {
-        return val !== '' && val !== 'undefined' && val !== null && val !== [] && val !== {};
+</dom-module>
+<script>
+  Polymer({
+    is: 'perf-metrics',
+    // properties and methods here
+    properties: {
+      data: {}
+    },
+    ready: function() {
+      // console.log('data',this.data);
+    },
+    isArray: function(o) {
+      return typeof o == "array" || (typeof o == "object" && o.constructor === Array);
+    },
+    isString: function(s) {
+      return typeof s == 'string';
+    },
+    attributeChanged: function(attrName, oldVal, newVal) {
+    },
+    _toArray: function(obj) {
+      if(this.isString(obj)) {
+        obj = this.unstringify(obj);
       }
-    });
-  </script>
-</polymer-element>
+      return Object.keys(obj).map(function(key) {
+        return {name: key, value: obj[key]};
+      });
+    },
+    stringify: function(json){
+      return JSON.stringify(json)
+    },
+    unstringify: function(s) {
+      return JSON.parse(s);
+    },
+    notEmpty: function(val) {
+      return val !== '' && val !== 'undefined' && val !== null && val !== [] && val !== {};
+    }
+  });
+</script>

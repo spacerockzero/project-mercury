@@ -22,7 +22,7 @@
     "escape-html": "^1.0.1",
     "express": "~4.11.1",
     "jade": "~1.9.1",
-    "mongoose": "~3.8.23",
+    "mongoose": "~5.7.6",
     "morgan": "~1.5.1",
     "phantomas": "~1.10.x",
     "q": "^1.2.0",
